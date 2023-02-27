@@ -1,21 +1,21 @@
-function [xdot,rNorm] = two_body_dynamics(x,mu)
+function xn_dot = two_body_dynamics(x,mu)
 
-% two_body_dynamics Full nonlinear twobody dynamics ODE
+% Full nonlinear twobody dynamics ODE: xn_dot = two_body_dynamics(~,x,mu)
 %
 %  Inputs: 
 %           x: 6 states of the smaller body in km and km/s
 %              [xPosition yPosition zPosition xVelocity yVelocity zVelocity]
-%          mu:
+%          mu: Standard gravitational parameter of larger body
 % 
 % Outputs:                
-%         xdot: Differential state
-%               6x1 array       
+%      xn_dot: Differential states 6x1 array   
+%
 % rNorm: Magnitude of the position vector
 % 
 % To solve this ODE, need to use an integrator of your choosing
 %
 % Created: July 15, 2022 by James Le - le_james@outlook.com
-% Last Update: July 18, 2022
+% Last Update: February 22, 2022
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
     % pull out states
@@ -27,7 +27,7 @@ function [xdot,rNorm] = two_body_dynamics(x,mu)
     zVel = x(6);
 
     % norm of position
-    rNorm = sqrt(xPos^2+yPos^2+zPos^2);
+    rNorm = sqrt(xPos^2 + yPos^2 + zPos^2);
 
     % velocity vector
     rDot = [xVel yVel zVel];
@@ -36,8 +36,8 @@ function [xdot,rNorm] = two_body_dynamics(x,mu)
     vDot = [-mu*xPos/rNorm^3 -mu*yPos/rNorm^3 -mu*zPos/rNorm^3];
 
     % stores next states
-    xdot = zeros(6,1);      % reshape to 6x1
-    xdot(1:3) = rDot;            
-    xdot(4:6) = vDot; 
+    xn_dot = zeros(6,1);      % reshape to 6x1
+    xn_dot(1:3) = rDot;            
+    xn_dot(4:6) = vDot; 
 
 end

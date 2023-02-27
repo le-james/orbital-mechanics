@@ -1,25 +1,50 @@
-function xn = two_body_dynamics_stm(x,mu)
+function xn_dot = two_body_dynamics_stm(x,mu)
 
-% two_body_dynamics_stm Full nonlinear twobody dynamics ODE
+% Full nonlinear twobody dynamics state transition matrix ODE: xn_dot = two_body_dynamics_stm(~,x,mu)
+%  Computes a two body trajectory and its STM
 %
 %  Inputs: 
-%           x: 6 states of the smaller body in km and km/s
+%           x: 6 states of the smaller body in km and km/s + 36 states for
+%              the STM
 %              [xPosition yPosition zPosition xVelocity yVelocity zVelocity]
-%          mu:
+%          mu: Standard gravitational parameter of larger body
 % 
 % Outputs:                
-%           xn: Differential state
+%      xn_dot: Differential two body and state transition matrix states 42x1 array   
 % 
 % To solve this ODE, need to use an integrator of your choosing
 %
 % Created: July 15, 2022 by James Le - le_james@outlook.com
-% Last Update: July 18, 2022
+% Last Update: February 23, 2022
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-    
-    % output of two body dynamics needed for stm computation
-    [two_body_states,rNorm] = two_body_dynamics(x(1:6),mu);
 
-    % stm dynamics jacobian
+    % store the two body states and state transition matrix states
+    xn_dot = zeros(length(x),1); % reshape to 42x1
+
+    % two body dynamics start
+    
+    % pull out states
+    xPos = x(1);
+    yPos = x(2);
+    zPos = x(3);
+    xVel = x(4);
+    yVel = x(5);
+    zVel = x(6);
+
+    % norm of position
+    rNorm = sqrt(xPos^2 + yPos^2 + zPos^2);
+
+    % stores next states
+    xn_dot(1:3) = [xVel yVel zVel]; % velocity vector
+    xn_dot(4:6) = [-mu*xPos/rNorm^3 -mu*yPos/rNorm^3 -mu*zPos/rNorm^3]; % acceleration vector
+
+    % two body dynamics end
+
+
+    
+    % computing the state transition matrix, phiDot
+
+    % jacobian of the two body ode
     G2 = zeros(6, 6);
 
     % top right 3x3 block of G2
@@ -41,19 +66,15 @@ function xn = two_body_dynamics_stm(x,mu)
     G2(6, 3) = (3*mu*x(3)^2)/(rNorm^5) - mu/(rNorm^3);
 
     % form the phi states into a matrix
-    phiSt = reshape(x(7:42), 6, 6);
+    phiSt = reshape(x(7:42),6,6);
     
-    % get stm ode and reshape to row
-%     phiDotRow = G2;                   % same results as below - 
-                                        % only slightly diff numbers in the stm
-    phiDot = G2*phiSt;                  % propagate stm
-    phiDotRow = reshape(phiDot, 1, 36);
-    
-    % store states
-    xn = zeros(length(two_body_states)+length(G2)^2,1); % reshape to 42x1
+    % propagate stm
+    phiDot = G2*phiSt;
 
-    xn(1:6) = two_body_states;  % two body position and velocity
+    % convert the stm from a 6x6 to a 1x36 vector
+    phiDotRow = reshape(phiDot,1,36);
 
-    xn(7:42) = phiDotRow;       % differential stm
+    % store differential stm
+    xn_dot(7:42) = phiDotRow;
 
 end

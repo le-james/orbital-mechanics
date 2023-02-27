@@ -8,10 +8,10 @@ function coes = cart2coes(x0,mu)
 %          mu: Standard graviational parameter
 % 
 % Outputs:                
-%          coes: All classical elements plus more            
+%          coes: All classical elements plus more
 % 
 % Created: July 15, 2022 by James Le - le_james@outlook.com
-% Last Update: July 20, 2022
+% Last Update: August 29, 2022
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
     rVec = x0(1:3);     % pull out position vector
@@ -24,15 +24,13 @@ function coes = cart2coes(x0,mu)
     eng = vNorm^2/2 - mu/rNorm;
 
     if eng == 0
-        error("Energy is equal to zero - Parabolic orbit - Check velocities")
+        disp("[WARN] cart2coes: Energy is equal to zero - Parabolic orbit - Check velocities")
     elseif eng > 0
-        error("Energy is greater than zero - Hyperbolic orbit - Check velocities")
+        disp("[WARN] cart2coes: Energy is greater than zero - Hyperbolic orbit - Check velocities")
     else
         % do nothing
     end
 
-%     xHat = [1 0 0];   % not used
-%     yHat = [0 1 0];   % not used
     zHat = [0 0 1];
 
     % specific angular momentum
@@ -65,14 +63,8 @@ function coes = cart2coes(x0,mu)
         omega = 2*pi-omega;
     end
 
-    % not working
     % semi-major axis
-%     a = (hNorm^2/mu)/(1-eNorm^2);
     a = -mu/2/eng;
-
-%     % energy
-%     vNorm = norm(vVec);
-%     eng = vNorm^2/2 - mu/rNorm;
 
     % orbital period
     T = 2*pi*sqrt(a^3/mu);
@@ -81,7 +73,6 @@ function coes = cart2coes(x0,mu)
     n = sqrt(mu/a^3);
 
     % true anomaly 
-    % f = acos((hNorm^2/μ/rNorm - 1)/eNorm)
     f = acos(dot(eVec, rVec)/(eNorm*rNorm));
 
     % eccentric anomaly
