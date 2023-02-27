@@ -1,20 +1,26 @@
 function [Y0,tspan_periodic_orbit] = differential_corrector(x0_guess,mass_ratio)
 
-% Full nonlinear twobody dynamics state transition matrix ODE: xn_dot = two_body_dynamics_stm(~,x,mu)
-%  Computes a two body trajectory and its STM
+% Single shooting differential corrector: [Y0,tspan_periodic_orbit] = differential_corrector(x0_guess,mass_ratio)
+%  Used to find the initial conditions of a periodic orbit
+%
+%    Use NASA tools at https://ssd.jpl.nasa.gov/tools/periodic_orbits.html
+%    to get an intial guess for a periodic orbit
+%
+%    NOTE: Only Lyapunov and Halo orbits work for this differential
+%    corrector
 %
 %  Inputs: 
-%           x: 6 states of the smaller body in km and km/s + 36 states for
-%              the STM
-%              [xPosition yPosition zPosition xVelocity yVelocity zVelocity]
-%  mass_ratio: Standard gravitational parameter of larger body
+%             x0_guess: Use the initial states from the NASA tools
+%           mass_ratio: Mass ratio of the three body system
 % 
 % Outputs:                
-%               : Differential two body and state transition matrix states 42x1 array   
-% 
+%                   Y0: Corrected initial states of the periodic orbit and
+%                   its state transition matrix - 1x42 vector
+% tspan_periodic_orbit: The last element in the array is the total time of
+%                       the periodic orbit in seconds
 %
 % Created: February 24, 2022 by James Le - le_james@outlook.com
-% Last Update: February 25, 2022
+% Last Update: February 26, 2022
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
     % integrator options
